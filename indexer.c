@@ -1,4 +1,4 @@
-#include "indexer.h"
+#include "record.h"
 #include <string.h>
 
 int recordCompare(struct record *arg1, struct record *arg2)
