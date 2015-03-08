@@ -366,3 +366,37 @@ int SLRemove(SortedListPtr list, void *newObj){
 	return 0;
 
 }
+
+
+/*
+ * SLFindItem looks for a given item in a SortedList. It
+ * returns 1 if the item is found and 0 otherwise.
+ */
+int SLFindItem (SortedListPtr list, void *name)
+{
+	if(list == NULL || name == NULL){
+		return 0;
+	}
+	
+	/*if list is empty, return 0 */
+	if(list->head == NULL){
+		return 0;
+	}
+	
+	ItemPtr tmp = list->head;
+	
+	while(tmp){
+		result = ((int(*)(void *, void *))list->compFunc)(tmp->data, name);
+		
+		if(result == 0){
+			return 1;
+		}else if(result == -1){
+			break;
+		}
+		
+		tmp = tmp->next;
+	}
+	
+	return 0;
+}
+
