@@ -176,5 +176,13 @@ void * SLGetItem( SortedListIteratorPtr iter );
 
 void * SLNextItem(SortedListIteratorPtr iter);
 
+
+/*
+ * SLFindItem looks for a given item in a SortedList. It
+ * returns 1 if the item is found and 0 otherwise.
+ */
+int SLFindItem (SortedListPtr list, void *name);
+
 #endif
+
 
