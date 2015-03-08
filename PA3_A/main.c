@@ -47,7 +47,7 @@ one = (string)malloc(sizeof(string)*50);
 two = (string)malloc(sizeof(string)*50);
 three = (string)malloc(sizeof(string)*50);
 retToken = TKGetNextToken(tokenizer);
-one = rerToken;
+one = retToken;
 //printf("%s ",retToken);
 
  int count;
@@ -82,7 +82,7 @@ three->fileList = (nodeRec *)malloc(sizeof(nodeRec));
  }*/
 
  hashmap* map =hashCreate();
- addElement(map, );
+ addElement(map, one );
 
  addElement(map, two);
  addElement(map, three);

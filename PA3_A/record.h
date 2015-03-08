@@ -19,7 +19,7 @@ typedef struct recordNode {
 
     string filename;
     int count;
-    recordNode * next;
+    struct recordNode  * next;
 
 
 } recordNode;
