@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include "tokenizer.c"
 #include "record.h"
+#include "hashmap.c"
 
 int main()
 {
@@ -41,17 +42,21 @@ int main()
 
 free (filename); */
 
-record *one, *two, *three;
-one = (record *)malloc(sizeof(record));
-two = (record *)malloc(sizeof(record));
-three = (record *)malloc(sizeof(record));
+string *one, *two, *three;
+one = (string)malloc(sizeof(string)*50);
+two = (string)malloc(sizeof(string)*50);
+three = (string)malloc(sizeof(string)*50);
 retToken = TKGetNextToken(tokenizer);
+one = rerToken;
 //printf("%s ",retToken);
 
  int count;
- one->fileList = (nodeRec *)malloc(sizeof(nodeRec));
+ unsigned long h ;
+ /*one->fileList = (nodeRec *)malloc(sizeof(nodeRec));
  one->fileList->filename="first file";
  one->word=retToken;
+ h = hash(retToken);
+ printf("hash number %d \n", h);
  one->fileList->count=1;
 // one->next= NULL;
 
@@ -68,17 +73,27 @@ three->fileList = (nodeRec *)malloc(sizeof(nodeRec));
  three->word=retToken;
  three->fileList->count=1;
  two->next = three;
- record * tmp = one;
+ record * tmp = one;*/
  //printf("word %s count %d filename %s\n", tmp->word, tmp->fileList->count, three->fileList->filename);
-
- while(tmp->next != NULL){
+ tokenNode * tmp = one;
+ /*while(tmp->next != NULL){
     printf("word %s count %d  name %s\n", tmp->word, tmp->fileList->count, tmp->fileList->filename);
     tmp=tmp->next;
- }
+ }*/
+
+ hashmap* map =hashCreate();
+ addElement(map, );
+
+ addElement(map, two);
+ addElement(map, three);
+ printf("here\n");
+ printf("word %s count %d\n", map->table[772].record->word,map->table[772].record->filelist->count );
  //printf("word %s count %d filename %s\n", tmp->word, tmp->fileList->count, three->fileList->filename);
     free(one);
   free(two);
    free(three);
     fclose(fp);
+ //free(map);
+
     return 0;
 }
