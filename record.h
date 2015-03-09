@@ -1,36 +1,96 @@
 #ifndef RECORD_H_INCLUDED
 #define RECORD_H_INCLUDED
 
-#include "sorted-list.h"
-
 typedef char * string;
 
-typedef struct record {
+typedef struct recordNode {
+
+    string filename;
+    int count;
+    struct recordNode  * next;
+
+} recordNode;
+
+typedef struct tokenNode{
 	
-string filename;
-int count;
-
-} record;
-
-typedef struct token{
-	
-string word;
-SortedListPtr fileList; // A SortedList of records
-
-} token;
+    string word;
+    recordNode *filelist;
+    struct tokenNode *next; // A list of records
+    
+} tokenNode;
 
 /* recordCompare compares two records. It compares them first by
  * count, then by filename if the counts are equal. It returns
- * -1 if arg2 goes before arg1 in the sorted-list, 1 if arg1 goes
- * before arg2 in the sorted-list, and 0 if they are identical.
+ * -1 if arg1 goes before arg2 in the list, 1 if arg2 goes
+ * before arg1 in the list, and 0 if they are identical.
  */
-int recordCompare (void *arg1, void *arg2);
+int recordCompare (recordNode *arg1, recordNode *arg2);
 
 
 /*
- * tokenCompare compares two tokens. It returns -1 if arg2 goes
- * before arg1, 1 if arg1 goes before arg2, and 0 if they are identical.
+ * DestroyRecordList takes a pointer to the head of a record list
+ * and destroys the entire list, freeing all dynamically allocated memory.
  */
-int tokenCompare (void *arg1, void *arg2);
+void DestroyRecordList(recordNode *head);
+
+
+/*
+ * DestroyTokenList takes a pointer to the head of a token list
+ * and destroys the entire list, freeing all dynamically allocated memory.
+ */
+void DestroyTokenList(tokenNode *head);
+
+/*
+ * CreateRecord creates a new recordNode object. The caller must provide
+ * the name of the file.
+ * 
+ * If the function succeeds, it returns a (non-NULL) recordNode object,
+ * otherwise, it returns NULL.
+ */
+recordNode *CreateRecord(string filename);
+
+
+/*
+ * CreateToken creates a new tokenNode object. The caller must provide
+ * the word and filename.
+ * 
+ * If the function succeeds, it returns a (non-NULL) tokenNode object,
+ * otherwise, it returns NULL.
+ */
+tokenNode *CreateToken(string word, string filename);
+
+
+/*
+ * InsertRecord inserts the given record into the list, maintaining order.
+ * 
+ * If the function succeeds, it returns 1. Otherwise, it returns 0.
+ */
+int InsertRecord(tokenNode *token, recordNode *record);
+
+
+/*
+ * UpdateRecord searches a record list for the given filename. If the
+ * filename is found, its count is incremented and the record is reinserted
+ * into the list to maintain order. Otherwise, a new recordNode
+ * object is created and inserted into the list, maintaining order.
+ *
+ * If the function succeeds, it returns 1, otherwise it returns 0.
+ */
+
+int UpdateRecord(tokenNode *token, string filename);
+
+
+/*
+ * UpdateToken searches a token list for the given word. If the
+ * word is found, filename's record is updated. Otherwise, a new tokenNode
+ * object is created and inserted into the list, maintaining alphabetic
+ * order.
+ *
+ * If the function succeeds, it returns a non-NULL tokenNode pointer,
+ * otherwise it returns NULL.
+ */
+
+tokenNode *UpdateToken(tokenNode *head, string word, string filename);
 
 #endif // RECORD_H_INCLUDED
+
