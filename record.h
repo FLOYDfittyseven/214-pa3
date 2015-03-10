@@ -31,33 +31,27 @@ int recordCompare (recordNode *arg1, recordNode *arg2);
  * DestroyRecordList takes a pointer to the head of a record list
  * and destroys the entire list, freeing all dynamically allocated memory.
  */
-void DestroyRecordList(recordNode *head);
+void DestroyRecordList(recordNode **head);
 
 
 /*
  * DestroyTokenList takes a pointer to the head of a token list
  * and destroys the entire list, freeing all dynamically allocated memory.
  */
-void DestroyTokenList(tokenNode *head);
+void DestroyTokenList(tokenNode **head);
 
 /*
  * CreateRecord creates a new recordNode object. The caller must provide
- * the name of the file.
- * 
- * If the function succeeds, it returns a (non-NULL) recordNode object,
- * otherwise, it returns NULL.
+ * the name of the file and a double pointer to its place in memory.
  */
-recordNode *CreateRecord(string filename);
+void CreateRecord(recordNode **rec, string filename);
 
 
 /*
  * CreateToken creates a new tokenNode object. The caller must provide
- * the word and filename.
- * 
- * If the function succeeds, it returns a (non-NULL) tokenNode object,
- * otherwise, it returns NULL.
+ * the word and filename and a double pointer to its place in memory.
  */
-tokenNode *CreateToken(string word, string filename);
+void CreateToken(tokenNode **tok, string word, string filename);
 
 
 /*
@@ -65,7 +59,7 @@ tokenNode *CreateToken(string word, string filename);
  * 
  * If the function succeeds, it returns 1. Otherwise, it returns 0.
  */
-int InsertRecord(tokenNode *token, recordNode *record);
+int InsertRecord(tokenNode **token, recordNode **record);
 
 
 /*
@@ -77,7 +71,7 @@ int InsertRecord(tokenNode *token, recordNode *record);
  * If the function succeeds, it returns 1, otherwise it returns 0.
  */
 
-int UpdateRecord(tokenNode *token, string filename);
+int UpdateRecord(tokenNode **token, string filename);
 
 
 /*
@@ -86,11 +80,11 @@ int UpdateRecord(tokenNode *token, string filename);
  * object is created and inserted into the list, maintaining alphabetic
  * order.
  *
- * If the function succeeds, it returns a non-NULL tokenNode pointer,
- * otherwise it returns NULL.
+ * If the function succeeds, it returns 1, otherwise, it returns 0.
  */
 
-tokenNode *UpdateToken(tokenNode *head, string word, string filename);
+int UpdateToken(tokenNode **head, string word, string filename);
 
 #endif // RECORD_H_INCLUDED
+
 
