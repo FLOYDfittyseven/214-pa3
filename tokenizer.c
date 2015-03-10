@@ -111,8 +111,9 @@ char *TKGetNextToken( TokenizerT * tk ) {
    
    char *retToken = malloc((count+1) * sizeof(char));
    memcpy(retToken, tmpToken, count);
-   retToken[count+1] = '\0';
+   retToken[count] = '\0';
  
   return retToken;
 }
+
 
