@@ -1,6 +1,7 @@
 #include "record.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 /* recordCompare compares two records. It compares them first by
  * count, then by filename if the counts are equal. It returns
@@ -39,23 +40,25 @@ int recordCompare(recordNode *arg1, recordNode *arg2)
  * DestroyRecordList takes a pointer to the head of a record list
  * and destroys the entire list, freeing all dynamically allocated memory.
  */
-void DestroyRecordList(recordNode *head)
+void DestroyRecordList(recordNode **head)
 {
-	if(!head)
+	if(*head == NULL)
 	{
 		return;
 	}
 	
-	recordNode *ptr = head->next;
+	recordNode *ptr = (*head)->next;
 	
 	while(ptr)
 	{
-		free(head);
-		head = ptr;
+		//free((*head)->filename);
+		free(*head);
+		*head = ptr;
 		ptr = ptr->next;
 	}
 	
-	free(head);
+	//free((*head)->filename);
+	free(*head);
 	
 	return;	
 }
@@ -65,84 +68,89 @@ void DestroyRecordList(recordNode *head)
  * DestroyTokenList takes a pointer to the head of a token list
  * and destroys the entire list, freeing all dynamically allocated memory.
  */
-void DestroyTokenList(tokenNode *head)
+void DestroyTokenList(tokenNode **head)
 {
-	if(!head)
+	if(*head == NULL)
 	{
 		return;
 	}
 	
-	tokenNode *ptr = head->next;
+	tokenNode *ptr = (*head)->next;
+	recordNode **files = &((*head)->filelist);
 	
 	while(ptr)
 	{
-		DestroyRecordList(head->filelist);
-		free(head);
-		head = ptr;
+		DestroyRecordList(files);
+		//free((*head)->word);
+		free(*head);
+		*head = ptr;
 		ptr = ptr->next;
 	}
 	
-	DestroyRecordList(head->filelist);
-	free(head);
+	files = &((*head)->filelist);
+	DestroyRecordList(files);
+	//free((*head)->word);
+	free(*head);
 	
 	return;
 }
 
 /*
  * CreateRecord creates a new recordNode object. The caller must provide
- * the name of the file.
- * 
- * If the function succeeds, it returns a (non-NULL) recordNode object,
- * otherwise, it returns NULL.
+ * the name of the file and a double pointer to its place in memory.
  */
-recordNode *CreateRecord(string filename)
+void CreateRecord(recordNode **rec, string filename)
 {
 	if(!filename)
 	{
-		return NULL;
+		return;
 	}
+	*rec = NULL;
+	*rec = malloc(sizeof(recordNode));
 	
-	recordNode *retRec = malloc(sizeof(recordNode));
-	
-	if(!retRec)
+	if(*rec == NULL)
 	{
-		return NULL;
+		return;
 	}
 	
-	retRec->filename = filename;
-	retRec->count = 1;
-	retRec->next = NULL;
+	(*rec)->filename = malloc(sizeof(char[500]));
+	if((*rec)->filename == NULL)
+	{
+		fprintf(stderr, "Memory issue\n");
+	}
+	memset((*rec)->filename, '\0', 500);
+	memcpy((*rec)->filename, filename, strlen(filename));
+	(*rec)->count = 1;
+	(*rec)->next = NULL;
 	
-	return retRec;
+	return;
 }
 
 
 /*
  * CreateToken creates a new tokenNode object. The caller must provide
- * the word and filename.
- * 
- * If the function succeeds, it returns a (non-NULL) tokenNode object,
- * otherwise, it returns NULL.
+ * the word and filename and a double pointer to its place in memory.
  */
-tokenNode *CreateToken(string word, string filename)
+void CreateToken(tokenNode **tok, string word, string filename)
 {
 	if(!word || !filename)
 	{
-		return NULL;
+		return;
 	}
+	*tok = NULL;
+	*tok = malloc(sizeof(tokenNode));
 	
-	tokenNode *retToken = malloc(sizeof(tokenNode));
-	
-	if(!retToken)
+	if(*tok == NULL)
 	{
-		return NULL;
+		return;
 	}
 	
-	retToken->word = word;
-	retToken->filelist = CreateRecord(filename);
-	retToken->next = NULL;
+	(*tok)->word = malloc(sizeof word);
+	strcpy((*tok)->word, word);
+	CreateRecord(&((*tok)->filelist), filename);
+	(*tok)->next = NULL;
 	
-	return retToken;
+	return;
 }
 
 
@@ -151,21 +159,23 @@ tokenNode *CreateToken(string word, string filename)
  * 
  * If the function succeeds, it returns 1. Otherwise, it returns 0.
  */
-int InsertRecord(tokenNode *token, recordNode *record)
+int InsertRecord(tokenNode **token, recordNode **record)
 {
-	if(!token || !record)
+	tokenNode *tok = *token;
+	recordNode *rec = *record;
+	if(!tok || !rec)
 	{
 		return 0;
 	}
 	
-	recordNode *compPtr = token->filelist;
+	recordNode *compPtr = tok->filelist;
 	recordNode *newPrev = compPtr;
 	int x;
 	
-	if(recordCompare(compPtr, record) > 0)
+	if(recordCompare(compPtr, rec) > 0)
 	{
-		record->next = compPtr;
-		token->filelist = record;
+		rec->next = compPtr;
+		tok->filelist = rec;
 		return 1;
 	}
 	
@@ -173,7 +183,7 @@ int InsertRecord(tokenNode *token, recordNode *record)
 	
 	while(compPtr)
 	{
-		x = recordCompare(compPtr, record);
+		x = recordCompare(compPtr, rec);
 		
 		if(x > 0)
 		{
@@ -184,8 +194,8 @@ int InsertRecord(tokenNode *token, recordNode *record)
 		compPtr = compPtr->next;
 	}
 	
-	record->next = compPtr;
-	newPrev->next = record;
+	rec->next = compPtr;
+	newPrev->next = rec;
 	
 	return 1;
 }
@@ -200,15 +210,16 @@ int InsertRecord(tokenNode *token, recordNode *record)
  * If the function succeeds, it returns 1, otherwise it returns 0.
  */
 
-int UpdateRecord(tokenNode *token, string filename)
+int UpdateRecord(tokenNode **token, string filename)
 {
-	if(!token || !filename)
+	tokenNode *tok = *token;
+	if(!tok || !filename)
 	{
 		return 0;
 	}
 	
 	int x, y, lowestNum;
-	recordNode *ptr = token->filelist;
+	recordNode *ptr = tok->filelist;
 	recordNode *prev = ptr;
 	recordNode *low = NULL;
 	recordNode *low_prev = NULL;
@@ -256,7 +267,7 @@ int UpdateRecord(tokenNode *token, string filename)
 		
 		prev->next = ptr->next;
 		ptr->count++;
-		y = InsertRecord(token, ptr);
+		y = InsertRecord(&tok, &ptr);
 		
 		return y;
 	}
@@ -265,7 +276,8 @@ int UpdateRecord(tokenNode *token, string filename)
 	 */
 	else
 	{
-		recordNode *newRecord = CreateRecord(filename);
+		recordNode *newRecord;
+		CreateRecord(&newRecord, filename);
 		
 		if(low_prev)
 		{
@@ -285,7 +297,7 @@ int UpdateRecord(tokenNode *token, string filename)
 		}
 		else
 		{
-			y = InsertRecord(token, newRecord);
+			y = InsertRecord(&tok, &newRecord);
 			return y;
 		}
 	}
@@ -298,19 +310,19 @@ int UpdateRecord(tokenNode *token, string filename)
  * object is created and inserted into the list, maintaining alphabetic
  * order.
  *
- * If the function succeeds, it returns a non-NULL tokenNode pointer,
- * otherwise it returns NULL.
+ * If the function succeeds, it returns 1, otherwise, it returns 0.
  */
 
-tokenNode *UpdateToken(tokenNode *head, string word, string filename)
+int UpdateToken(tokenNode **head, string word, string filename)
 {
-	if(!head || !word || !filename)
+	tokenNode *h = *head;
+	if(!h || !word || !filename)
 	{
-		return NULL;
+		return 0;
 	}
 	
-	tokenNode *ptr = head;
-	tokenNode *prev = head;
+	tokenNode *ptr = h;
+	tokenNode *prev = h;
 	tokenNode *newNode;
 	int x, y;
 	
@@ -320,18 +332,19 @@ tokenNode *UpdateToken(tokenNode *head, string word, string filename)
 	 */
 	if(x > 0)
 	{
-		newNode = CreateToken(word, filename);
+		CreateToken(&newNode, word, filename);
 		newNode->next = ptr;
+		*head = newNode;
 		
-		return newNode;
+		return 1;
 	}
 	/* Head is a match
 	 */
 	else if(x == 0)
 	{
-		y = UpdateRecord(ptr, filename);
+		y = UpdateRecord(&ptr, filename);
 		
-		return head;
+		return 1;
 	}
 	
 	ptr = ptr->next;
@@ -346,19 +359,20 @@ tokenNode *UpdateToken(tokenNode *head, string word, string filename)
 		}
 		else if(x == 0)
 		{
-			y = UpdateRecord(ptr, filename);
+			y = UpdateRecord(&ptr, filename);
 			
-			return head;
+			return 1;
 		}
 		
 		prev = ptr;
 		ptr = ptr->next;
 	}
 	
-	newNode = CreateToken(word, filename);
+	CreateToken(&newNode, word, filename);
 	newNode->next = ptr;
 	prev->next = newNode;
 	
-	return head;
+	return 1;
 }
+
 
