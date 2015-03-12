@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <strings.h>
 
 /* recordCompare compares two records. It compares them first by
  * count, then by filename if the counts are equal. It returns
@@ -19,7 +20,7 @@ int recordCompare(recordNode *arg1, recordNode *arg2)
     return 1;
   }
   
-  int x = strcmp(arg1->filename, arg2->filename);
+  int x = strcasecmp(arg1->filename, arg2->filename);
   
   if(x < 0)
   {
@@ -374,3 +375,4 @@ int UpdateToken(tokenNode **head, string word, string filename)
 	
 	return 1;
 }
+
