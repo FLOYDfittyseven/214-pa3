@@ -1,0 +1,26 @@
+# depslib dependency file v1.0
+1425850906 source:/Users/Anush/Documents/214-pa3/214-pa3/PA3_A/main.c
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	"tokenizer.c"
+	"record.h"
+	"hashmap.c"
+
+1425781275 /Users/Anush/Documents/214-pa3/214-pa3/PA3_A/tokenizer.c
+	"tokenizer.h"
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<ctype.h>
+
+1425755713 /Users/Anush/Documents/214-pa3/214-pa3/PA3_A/tokenizer.h
+	<stdio.h>
+
+1425855202 /Users/Anush/Documents/214-pa3/214-pa3/PA3_A/record.h
+
+1425855200 /Users/Anush/Documents/214-pa3/214-pa3/PA3_A/hashmap.c
+	<stdio.h>
+	<stdlib.h>
+	"record.h"
+
